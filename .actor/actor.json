@@ -1,0 +1,13 @@
+{
+    "actorSpecification": 1,
+    "name": "japan-trade-statistics",
+    "title": "Japan Trade Statistics by Country & Commodity (Customs)",
+    "description": "Official Japan Customs trade statistics as clean JSON: monthly or yearly exports, imports and trade balance by partner country (since 1979) and by commodity group with quantities (since 1988).",
+    "version": "1.0",
+    "buildTag": "latest",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile"
+}

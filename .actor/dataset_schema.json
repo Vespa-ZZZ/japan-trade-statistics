@@ -1,0 +1,78 @@
+{
+    "actorSpecification": 1,
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "period",
+                    "area",
+                    "partner",
+                    "flow",
+                    "partnerCode",
+                    "partnerName",
+                    "commodityCode",
+                    "commodityName",
+                    "exportJPY",
+                    "importJPY",
+                    "balanceJPY",
+                    "valueJPY",
+                    "quantity",
+                    "quantityUnit"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "period": {
+                        "label": "Period"
+                    },
+                    "area": {
+                        "label": "Area"
+                    },
+                    "partner": {
+                        "label": "Partner"
+                    },
+                    "flow": {
+                        "label": "Flow"
+                    },
+                    "partnerCode": {
+                        "label": "Country code"
+                    },
+                    "partnerName": {
+                        "label": "Country"
+                    },
+                    "commodityCode": {
+                        "label": "Commodity code"
+                    },
+                    "commodityName": {
+                        "label": "Commodity"
+                    },
+                    "exportJPY": {
+                        "label": "Exports (JPY)",
+                        "format": "number"
+                    },
+                    "importJPY": {
+                        "label": "Imports (JPY)",
+                        "format": "number"
+                    },
+                    "balanceJPY": {
+                        "label": "Balance (JPY)",
+                        "format": "number"
+                    },
+                    "valueJPY": {
+                        "label": "Value (JPY)",
+                        "format": "number"
+                    },
+                    "quantity": {
+                        "label": "Quantity",
+                        "format": "number"
+                    },
+                    "quantityUnit": {
+                        "label": "Unit"
+                    }
+                }
+            }
+        }
+    }
+}

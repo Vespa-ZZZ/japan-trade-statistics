@@ -1,0 +1,167 @@
+{
+    "title": "Japan trade statistics",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "What to fetch",
+            "type": "string",
+            "editor": "select",
+            "enum": [
+                "countries",
+                "commodities"
+            ],
+            "enumTitles": [
+                "Exports & imports by partner country",
+                "Exports or imports by commodity group"
+            ],
+            "default": "countries",
+            "description": "`countries`: total exports, imports and balance for an area and each partner country in it. `commodities`: value (and quantity where published) for about 55 commodity groups (概況品), for one partner and flow."
+        },
+        "frequency": {
+            "title": "Frequency",
+            "type": "string",
+            "editor": "select",
+            "enum": [
+                "monthly",
+                "yearly"
+            ],
+            "enumTitles": [
+                "Monthly",
+                "Calendar year"
+            ],
+            "default": "monthly",
+            "description": "Monthly or calendar-year figures."
+        },
+        "from": {
+            "title": "From period",
+            "type": "string",
+            "editor": "textfield",
+            "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
+            "prefill": "2024-01",
+            "description": "YYYY or YYYY-MM (inclusive, month 01-12). With yearly frequency a month is accepted and the whole year is included. Leave empty for the full history."
+        },
+        "to": {
+            "title": "To period",
+            "type": "string",
+            "editor": "textfield",
+            "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
+            "description": "YYYY or YYYY-MM (inclusive). Leave empty for the latest published period."
+        },
+        "areas": {
+            "title": "Areas (countries mode)",
+            "type": "array",
+            "editor": "select",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "世界",
+                    "アジア",
+                    "大洋州",
+                    "北米",
+                    "中南米",
+                    "西欧",
+                    "中東欧・ロシア等",
+                    "中東",
+                    "アフリカ",
+                    "特殊地域",
+                    "EU",
+                    "ASEAN"
+                ]
+            },
+            "prefill": [
+                "世界"
+            ],
+            "description": "世界 = world totals only. Regions (アジア, 北米, EU, ASEAN …) also list every partner country in the region."
+        },
+        "partnerCodes": {
+            "title": "Partner country codes (countries mode)",
+            "type": "array",
+            "editor": "stringList",
+            "description": "Optional filter by Japan Customs country code, e.g. `105` (China), `103` (Korea), `304` (USA). Use `Total` for the area total row."
+        },
+        "partners": {
+            "title": "Partners (commodities mode)",
+            "type": "array",
+            "editor": "select",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "世界",
+                    "米国",
+                    "EU",
+                    "アジア",
+                    "中国",
+                    "韓国",
+                    "ASEAN",
+                    "中東",
+                    "ロシア"
+                ]
+            },
+            "prefill": [
+                "世界"
+            ],
+            "description": "Partner for the commodity breakdown."
+        },
+        "flows": {
+            "title": "Flows (commodities mode)",
+            "type": "array",
+            "editor": "select",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "export",
+                    "import"
+                ],
+                "enumTitles": [
+                    "Exports",
+                    "Imports"
+                ]
+            },
+            "default": [
+                "export",
+                "import"
+            ],
+            "description": "Exports, imports or both."
+        },
+        "commodityCodes": {
+            "title": "Commodity codes, both flows (commodities mode)",
+            "type": "array",
+            "editor": "stringList",
+            "description": "Optional filter by commodity code (applies to both flows). Codes differ between the export and import tables (e.g. semiconductors etc. are 70323 in exports, 70311 in imports) — use the per-flow fields below, or the name filter, when filtering both flows. Examples: `0-9` (total), `703` (electrical machinery, exports)."
+        },
+        "exportCommodityCodes": {
+            "title": "Export commodity codes (commodities mode)",
+            "type": "array",
+            "editor": "stringList",
+            "description": "Codes used only for the export table, e.g. `70323` (semiconductors etc.)."
+        },
+        "importCommodityCodes": {
+            "title": "Import commodity codes (commodities mode)",
+            "type": "array",
+            "editor": "stringList",
+            "description": "Codes used only for the import table, e.g. `70311` (semiconductors etc.)."
+        },
+        "commodityNameContains": {
+            "title": "Commodity name contains (commodities mode)",
+            "type": "array",
+            "editor": "stringList",
+            "description": "Keep commodity groups whose Japanese name or top-level group contains one of these strings, e.g. `半導体`, `自動車`, `医薬品`. Works across flows."
+        },
+        "maxItems": {
+            "title": "Max rows",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000,
+            "default": 100000,
+            "description": "Maximum number of rows to output."
+        },
+        "requestIntervalMs": {
+            "title": "Delay between requests (ms)",
+            "type": "integer",
+            "minimum": 1000,
+            "default": 2000,
+            "description": "Pause between file downloads. Minimum 1000 ms."
+        }
+    }
+}
