@@ -10,7 +10,7 @@ const FILES = {
     'https://www.customs.go.jp/toukei/suii/html/data/d42ca001.csv': bytes('d42ca001.csv'),
 };
 
-async function exec(input, files = FILES) {
+async function exec(input, files = FILES, configureActor) {
     const records = [];
     const values = new Map();
     const lifecycle = [];
@@ -32,6 +32,7 @@ async function exec(input, files = FILES) {
         if (body === 503) return new Response('busy', { status: 503 });
         return new Response(body);
     };
+    configureActor?.(actor, records);
     await run({ actor, log, fetchImpl, sleep: async () => {} });
     return { records, summary: values.get('RUN_SUMMARY'), lifecycle, logs, requests };
 }
@@ -102,4 +103,24 @@ test('invalid periods are rejected before any download', async () => {
     }
     const ok = await exec({ frequency: 'monthly', from: '2024-01', to: '2024' });
     assert.deepEqual(ok.lifecycle, ['exit']);
+});
+
+test('prechecks the dataset item budget and allows non-PPE output', async () => {
+    for (const [isPayPerEvent, budget] of [[true, 1], [true, 0], [false, 0]]) {
+        const configureActor = (actor, records) => {
+            actor.getChargingManager = () => ({
+                getPricingInfo: () => ({ isPayPerEvent }),
+                calculateMaxEventChargeCountWithinLimit(event) {
+                    assert.equal(event, 'apify-default-dataset-item');
+                    return budget - records.length;
+                },
+            });
+        };
+        const input = { mode: 'countries', areas: ['世界'], frequency: 'monthly', from: '2024-01', to: '2024-03' };
+        const result = await exec(input, FILES, configureActor);
+        assert.deepEqual(result.lifecycle, ['exit']);
+        assert.equal(result.records.length, isPayPerEvent ? budget : 3);
+        assert.equal(result.summary.pushed, result.records.length);
+        assert.equal(result.summary.stopReason, isPayPerEvent ? 'spendingLimit' : undefined);
+    }
 });

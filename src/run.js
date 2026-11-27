@@ -1,4 +1,5 @@
 import { setTimeout as delay } from 'node:timers/promises';
+import { pushDataWithinLimit } from './charging.js';
 import {
     AREAS, COMMODITY_PARTNERS, SOURCE, areaTableUrl, commodityTableUrl, decode, parseAreaTable,
     parseCommodityTable, periodInRange, sanitize,
@@ -98,6 +99,7 @@ export async function run({ actor, log, fetchImpl = fetch, sleep = delay }) {
 
         const get = makeFetcher({ fetchImpl, sleep, intervalMs, log });
         let pushed = 0;
+        let limitReached = false;
         let latest = null;
         for (const { url, meta } of tables) {
             if (pushed >= maxItems) break;
@@ -132,12 +134,21 @@ export async function run({ actor, log, fetchImpl = fetch, sleep = delay }) {
                 });
                 if (pushed + out.length >= maxItems) break;
             }
-            for (let i = 0; i < out.length; i += BATCH) await actor.pushData(out.slice(i, i + BATCH));
-            pushed += out.length;
+            for (let i = 0; i < out.length; i += BATCH) {
+                const batch = out.slice(i, i + BATCH);
+                const result = await pushDataWithinLimit(actor, batch);
+                limitReached = result?.eventChargeLimitReached === true;
+                pushed += limitReached ? result.chargedCount : batch.length;
+                if (limitReached) break;
+            }
+            if (limitReached) break;
             log.info(`${url}: ${out.length} rows`);
         }
-        await actor.setValue('RUN_SUMMARY', { tables: tables.length, pushed, latestPeriod: latest });
-        if (pushed === 0) log.warning('No rows matched. Check the period range and filters.');
+        await actor.setValue('RUN_SUMMARY', {
+            tables: tables.length, pushed, latestPeriod: latest, ...(limitReached && { stopReason: 'spendingLimit' }),
+        });
+        if (limitReached) log.warning('Pay-per-event charge limit reached. Stopping dataset output.');
+        else if (pushed === 0) log.warning('No rows matched. Check the period range and filters.');
         log.info(`Done. Pushed ${pushed} rows. Latest period: ${latest ?? 'n/a'}.`);
         await actor.exit();
     } catch (err) {
